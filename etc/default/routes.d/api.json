@@ -1,0 +1,36 @@
+[
+	["/api/model/([^/]+)$", {
+		"format":"json",
+		"modules":[
+			["model/schema", {"model":"#{0}"}]
+		]
+	}, "api_model_schema", "/api/model/{model}"],
+
+	["/api/model/([^/]+)/browse$", {
+		"format":"json",
+		"modules":[
+			["model/browse", {"model":"#{0}"}]
+		]
+	}, "api_model_browse", "/api/model/{model}/browse"],
+
+	["/api/model/([^/]+)/create$", {
+		"format":"json",
+		"modules":[
+			["model/edit", {"model":"#{0}", "new":true}]
+		]
+	}, "api_model_create", "/api/model/{model}/create"],
+
+	["/api/model/([^/]+)/([^/]+)/edit$", {
+		"format":"json",
+		"modules":[
+			["model/edit", {"model":"#{0}", "id":"#{1}"}]
+		]
+	}, "api_model_object_edit", "/api/model/{model}/{id}/edit"],
+
+	["/api/model/([^/]+)/([^/]+)/drop$", {
+		"format":"json",
+		"modules":[
+			["model/drop$", {"model":"#{0}", "id":"#{1}"}]
+		]
+	}, "api_model_object_drop", "/api/model/{model}/{id}/drop"]
+]
