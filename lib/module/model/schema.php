@@ -8,7 +8,7 @@ $response = array(
 	'message' => 'schema-not-found'
 );
 
-if (class_exists($cname)) {
+if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 	if ($cname::can_user(\System\Model\Perm::VIEW_SCHEMA, $request->user)) {
 		$menu = Godmode\Router::get_schemas();
 
@@ -22,14 +22,23 @@ if (class_exists($cname)) {
 					$attr = \System\Model\Database::get_attr($cname, $name);
 					$attr['name'] = $name;
 
+					if ($attr[0] == \System\Model\Database::REL_BELONGS_TO || $attr[0] == \System\Model\Database::REL_HAS_MANY) {
+						$rel_cname = $attr['model'];
+
+						if (!is_subclass_of($rel_cname, '\System\Model\Perm') || !$rel_cname::can_user(\System\Model\Perm::VIEW_SCHEMA, $request->user)) {
+							$attr = null;
+							continue;
+						}
+					}
+
 					switch ($attr[0])
 					{
 						case 'bool': $attr['type'] = 'boolean'; break;
 						case 'varchar': $attr['type'] = 'string'; break;
 						case 'text': $attr['type'] = 'text'; break;
 						case 'json': $attr['type'] = 'object'; break;
-						case 'belongs_to': $attr['type'] = 'model'; break;
-						case 'has_many': $attr['type'] = 'collection'; break;
+						case \System\Model\Database::REL_BELONGS_TO: $attr['type'] = 'model'; break;
+						case \System\Model\Database::REL_HAS_MANY: $attr['type'] = 'collection'; break;
 						default: $attr['type'] = $attr[0];
 					}
 
@@ -37,8 +46,10 @@ if (class_exists($cname)) {
 						$attr['model'] = \System\Loader::get_model_from_class($attr['model']);
 					}
 
-					unset($attr[0]);
-					$attrs[] = $attr;
+					if (is_array($attr)) {
+						unset($attr[0]);
+						$attrs[] = $attr;
+					}
 				}
 			}
 

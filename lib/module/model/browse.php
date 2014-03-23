@@ -22,7 +22,7 @@ if ($request->get('per_page')) {
 	$per_page = $request->get('per_page');
 }
 
-if (class_exists($cname)) {
+if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 	if ($cname::can_user(\System\Model\Perm::BROWSE, $request->user)) {
 		def($sort, array('created_at desc'));
 

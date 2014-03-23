@@ -11,7 +11,7 @@ $message = null;
 $data = null;
 $meta = null;
 
-if (class_exists($cname)) {
+if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 	if ($item = $new ? (new $cname()):find($cname, $id)) {
 		$data = $request->post();
 
