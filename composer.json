@@ -1,0 +1,12 @@
+{
+	"name":"just-paja/fudjan-api",
+	"description":"Frontend JSON API for object actions",
+	"license":"GPL-3.0+",
+	"config":{
+		"vendor-dir":"lib/vendor"
+	},
+	"require":{
+		"just-paja/fudjan":">=0.4",
+		"ronan-gloo/jadephp":"dev-master@dev"
+	}
+}
