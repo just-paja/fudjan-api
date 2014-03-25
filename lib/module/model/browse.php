@@ -48,10 +48,14 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 
 		if ($response['status'] == 200) {
 			$query = get_all($cname, $conds, $opts);
+			$data = array();
 
 			if (any($sort)) {
-				foreach ($sort as $sort_item) {
-					$sort_by[] = $sort_item['attr'].' '.$sort_item['mode'];
+				foreach ($sort as $sort_rec) {
+					$sort_item = explode(' ', $sort_rec);
+					def($sort_item[1], 'asc');
+
+					$sort_by[] = $sort_item[0].' '.$sort_item[1];
 				}
 			} else {
 				$sort_by = array('created_at desc');
@@ -72,7 +76,11 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 							}
 						}
 					} else {
-						$query->where(array($filter => $filter_val));
+						if (\System\Model\Database::attr_exists($cname, $filter)) {
+							$query->where(array($filter => $filter_val));
+						} else if ($cname::has_filter($filter)) {
+							$cname::filter($query, $filter, $filter_val);
+						} else throw new \System\Error\Argument('Model does not have attr', $filter);
 					}
 				}
 			}
