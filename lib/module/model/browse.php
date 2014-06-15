@@ -52,10 +52,9 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 
 			if (any($sort)) {
 				foreach ($sort as $sort_rec) {
-					$sort_item = explode(' ', $sort_rec);
-					def($sort_item[1], 'asc');
+					def($sort_rec['mode'], 'asc');
 
-					$sort_by[] = $sort_item[0].' '.$sort_item[1];
+					$sort_by[] = $sort_rec['attr'].' '.$sort_rec['mode'];
 				}
 			} else {
 				$sort_by = array('created_at desc');
