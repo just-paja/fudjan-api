@@ -30,7 +30,7 @@
 	["/api/model/([^/]+)/([^/]+)/drop$", {
 		"format":"json",
 		"modules":[
-			["model/drop$", {"model":"#{0}", "id":"#{1}"}]
+			["model/drop", {"model":"#{0}", "id":"#{1}"}]
 		]
 	}, "api_model_object_drop", "/api/model/{model}/{id}/drop"]
 ]
