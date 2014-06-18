@@ -6,10 +6,10 @@ def($new, false);
 $this->req('model');
 
 $cname = System\Loader::get_class_from_model($model);
-$status = 404;
-$message = null;
-$data = null;
-$meta = null;
+$response = array(
+	'message' => 'not-found',
+	'status'  => 404,
+);
 
 if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 	if ($item = $new ? (new $cname()):find($cname, $id)) {
@@ -49,19 +49,18 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 		try {
 			$item->save();
 		} catch (\System\Error $e) {
-			$status = 500;
+			$response['status'] = 500;
 		}
 
-		if ($status == 500) {
-			$message = 'Failed to save object';
+		if ($response['status'] == 500) {
+			$response['message'] = 'Failed to save object';
 		} else {
-			$status = 200;
+			$response['message'] = $new ? 'saved':'created';
+			$response['status'] = 200;
 		}
 
-		$data = $item->to_object();
+		$response['data'] = $item->to_object();
 	}
-} else {
-	$message = 'Model not found';
 }
 
-$this->json_response($status, $message, $data, $meta);
+$this->partial(null, $response);
