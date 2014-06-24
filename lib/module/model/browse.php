@@ -90,7 +90,7 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 				$data[] = $item->to_object();
 			}
 
-			$response['total'] = $count;
+			$response['total'] = intval($count);
 			$response['data'] = $data;
 		}
 	} else {
