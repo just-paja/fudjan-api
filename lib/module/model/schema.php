@@ -46,6 +46,20 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 						$attr['model'] = \System\Loader::get_model_from_class($attr['model']);
 					}
 
+					if (isset($attr['options']) && isset($attr['options'][0]) && $attr['options'][0] == 'callback') {
+						$opts = $attr['options'];
+						array_shift($opts);
+						$opts = call_user_func($opts);
+						$attr['options'] = array();
+
+						foreach ($opts as $opt_value=>$opt_name) {
+							$attr['options'][] = array(
+								'name'  => $opt_name,
+								'value' => $opt_value,
+							);
+						}
+					}
+
 					if (is_array($attr)) {
 						unset($attr[0]);
 						$attrs[] = $attr;
