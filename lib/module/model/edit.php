@@ -45,6 +45,9 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 			}
 		}
 
+		if ($item->has_attr('author') && $request->user) {
+			$item->author = $request->user;
+		}
 
 		try {
 			$item->save();
