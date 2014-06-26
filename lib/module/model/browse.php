@@ -22,6 +22,7 @@ if ($request->get('per_page')) {
 	$per_page = $request->get('per_page');
 }
 
+
 if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 	if ($cname::can_user(\System\Model\Perm::BROWSE, $request->user)) {
 		def($sort, array('created_at desc'));
@@ -66,12 +67,10 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 					}
 
 					if (is_array($filter_val)) {
-						if (empty($filter_val['type'])) {
-							$query->where_in($filter, $filter_val);
+						if (array_keys($filter_val) !== range(0, count($filter_val) - 1)) {
+							$query->add_filter($filter_val);
 						} else {
-							if ($filter_val['type'] == 'or') {
-								$query->add_filter_batch($filter_val['or'], null, true);
-							}
+							$query->where_in($filter, $filter_val);
 						}
 					} else {
 						if (\System\Model\Database::attr_exists($cname, $filter)) {
