@@ -19,7 +19,7 @@ $sort = html_entity_decode($request->get('sort'));
 $sort_by = array();
 
 if ($request->get('per_page')) {
-	$per_page = $request->get('per_page');
+	$per_page = intval($request->get('per_page'));
 }
 
 
@@ -82,15 +82,27 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 				}
 			}
 
-			$items = $query->paginate($per_page, $page)->sort_by(implode(', ', $sort_by))->fetch();
-			$count = $query->count();
+			$query->paginate($per_page, $page)->sort_by(implode(', ', $sort_by));
+			$send = true;
 
-			foreach ($items as $item) {
-				$data[] = $item->to_object();
+			try {
+				$items = $query->fetch();
+				$count = $query->count();
+			} catch (\System\Error\Database $e) {
+				$send = false;
+
+				$response['status'] = 400;
+				$response['message'] = $e->get_explanation();
 			}
 
-			$response['total'] = intval($count);
-			$response['data'] = $data;
+			if ($send) {
+				foreach ($items as $item) {
+					$data[] = $item->to_object();
+				}
+
+				$response['total'] = intval($count);
+				$response['data'] = $data;
+			}
 		}
 	} else {
 		$response['status'] = 403;
