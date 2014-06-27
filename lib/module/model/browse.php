@@ -15,13 +15,14 @@ $status = 200;
 $meta = null;
 
 $filters = html_entity_decode($request->get('filters'));
-$sort = html_entity_decode($request->get('sort'));
+$sort    = html_entity_decode($request->get('sort'));
+$joins   = html_entity_decode($request->get('join'));
+
 $sort_by = array();
 
 if ($request->get('per_page')) {
 	$per_page = intval($request->get('per_page'));
 }
-
 
 if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 	if ($cname::can_user(\System\Model\Perm::BROWSE, $request->user)) {
@@ -44,6 +45,29 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 			} catch (\System\Error\Format $e) {
 				$response['status'] = 400;
 				$response['message'] = 'malformed-sort';
+			}
+		}
+
+		if ($joins) {
+			try {
+				$joins = \System\Json::decode($joins);
+			} catch (\System\Error\Format $e) {
+				$response['status'] = 400;
+				$response['message'] = 'malformed-joins';
+			}
+
+			if ($joins) {
+				$joins = array_map('strval', $joins);
+
+				foreach ($joins as $attr) {
+					$def = \System\Model\Database::get_attr($cname, $attr);
+
+					if (!in_array($def[0], array(\System\Model\Database::REL_BELONGS_TO, \System\Model\Database::REL_HAS_ONE))) {
+						$response['status'] = 400;
+						$response['message'] = 'not-a-belongs-to-relation';
+						$response['attr'] = $attr;
+					}
+				}
 			}
 		}
 
@@ -96,12 +120,28 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 			}
 
 			if ($send) {
+				$valid = true;
+
 				foreach ($items as $item) {
-					$data[] = $item->to_object();
+					$obj = $item->to_object();
+
+					if ($joins) {
+						foreach ($joins as $attr) {
+							$rel = $item->$attr;
+
+							if ($rel) {
+								$obj[$attr] = $rel->to_object();
+							}
+						}
+					}
+
+					$data[] = $obj;
 				}
 
-				$response['total'] = intval($count);
-				$response['data'] = $data;
+				if ($valid) {
+					$response['total'] = intval($count);
+					$response['data'] = $data;
+				}
 			}
 		}
 	} else {
