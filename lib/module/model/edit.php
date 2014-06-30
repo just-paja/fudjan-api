@@ -19,7 +19,7 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 			if ($item->has_attr($attr_name)) {
 				$def = \System\Model\Database::get_attr($cname, $attr_name);
 
-				if (preg_match('/^[\{\[].+[\}\]]$/', $val)) {
+				if (preg_match('/^[\{\[].*[\}\]]$/', $val)) {
 					$val = \System\Json::decode(html_entity_decode($val));
 				}
 
