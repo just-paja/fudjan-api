@@ -35,7 +35,6 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 					{
 						case 'bool': $attr['type'] = 'boolean'; break;
 						case 'varchar': $attr['type'] = 'string'; break;
-						case 'text': $attr['type'] = 'text'; break;
 						case 'json': $attr['type'] = 'object'; break;
 						case \System\Model\Database::REL_BELONGS_TO: $attr['type'] = 'model'; break;
 						case \System\Model\Database::REL_HAS_MANY: $attr['type'] = 'collection'; break;
