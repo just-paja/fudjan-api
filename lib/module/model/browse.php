@@ -123,13 +123,13 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 				$valid = true;
 
 				foreach ($items as $item) {
-					$obj = $item->to_object();
+					$obj = $item->to_object_with_perms($request->user);
 
 					if ($joins) {
 						foreach ($joins as $attr) {
 							$rel = $item->$attr;
 
-							if ($rel) {
+							if ($rel && $rel->can_be(\System\Model\Perm::BROWSE, $request->user)) {
 								$obj[$attr] = $rel->to_object();
 							}
 						}
