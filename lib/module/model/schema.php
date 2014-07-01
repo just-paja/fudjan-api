@@ -3,12 +3,19 @@
 $this->req('model');
 
 $cname = System\Loader::get_class_from_model($model);
+$exists = class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm');
+
 $response = array(
 	'status'  => 404,
 	'message' => 'schema-not-found'
 );
 
-if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
+$rel_attrs = array(
+	\System\Model\Database::REL_BELONGS_TO,
+	\System\Model\Database::REL_HAS_MANY
+);
+
+if ($exists) {
 	if ($cname::can_user(\System\Model\Perm::VIEW_SCHEMA, $request->user)) {
 		$menu = Godmode\Router::get_schemas();
 
@@ -22,10 +29,11 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 					$attr = \System\Model\Database::get_attr($cname, $name);
 					$attr['name'] = $name;
 
-					if ($attr[0] == \System\Model\Database::REL_BELONGS_TO || $attr[0] == \System\Model\Database::REL_HAS_MANY) {
+					if (in_array($attr[0], $rel_attrs)) {
 						$rel_cname = $attr['model'];
+						$is_subclass = is_subclass_of($rel_cname, '\System\Model\Perm');
 
-						if (!is_subclass_of($rel_cname, '\System\Model\Perm') || !$rel_cname::can_user(\System\Model\Perm::VIEW_SCHEMA, $request->user)) {
+						if (!($is_subclass && $rel_cname::can_user(\System\Model\Perm::VIEW_SCHEMA, $request->user))) {
 							$attr = null;
 							continue;
 						}
@@ -42,7 +50,7 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 					}
 
 					if (isset($attr['model'])) {
-						$attr['model'] = \System\Loader::get_model_from_class($attr['model']);
+						$attr['model'] = \System\Loader::get_model_from_class($rel_cname);
 					}
 
 					if (isset($attr['options']) && isset($attr['options'][0]) && $attr['options'][0] == 'callback') {
