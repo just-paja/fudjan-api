@@ -59,6 +59,12 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 						}
 					}
 
+					// Word 'default' is keyword in some browsers, so pwf-models use 'def' instead
+					if (isset($attr['default'])) {
+						$attr['def'] = $attr['default'];
+						unset($attr['default']);
+					}
+
 					if (is_array($attr)) {
 						unset($attr[0]);
 						$attrs[] = $attr;
