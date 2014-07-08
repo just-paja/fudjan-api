@@ -53,10 +53,15 @@ if ($exists) {
 						$attr['model'] = \System\Loader::get_model_from_class($rel_cname);
 					}
 
-					if (isset($attr['options']) && isset($attr['options'][0]) && $attr['options'][0] == 'callback') {
-						$opts = $attr['options'];
-						array_shift($opts);
-						$opts = call_user_func($opts);
+					if (isset($attr['options'])) {
+						if (isset($attr['options'][0]) && $attr['options'][0] == 'callback') {
+							$opts = $attr['options'];
+							array_shift($opts);
+							$opts = call_user_func($opts);
+						} else {
+							$opts = $attr['options'];
+						}
+
 						$attr['options'] = array();
 
 						foreach ($opts as $opt_value=>$opt_name) {
