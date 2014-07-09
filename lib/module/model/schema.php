@@ -76,6 +76,12 @@ if ($exists) {
 					if (isset($attr['default'])) {
 						$attr['def'] = $attr['default'];
 						unset($attr['default']);
+
+						if (in_array($attr[0], array('image'))) {
+							$attr['def'] = \System\Image::from_path($attr['def'])->to_object();
+						} else if (in_array($attr[0], array('file', 'sound'))) {
+							$attr['def'] = \System\File::from_path($attr['def'])->to_object();
+						}
 					}
 
 					if (is_array($attr)) {
