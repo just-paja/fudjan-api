@@ -55,11 +55,10 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 			$item->save();
 		} catch (\System\Error $e) {
 			$response['status'] = 500;
+			$response['message'] = $e->get_explanation();
 		}
 
-		if ($response['status'] == 500) {
-			$response['message'] = 'Failed to save object';
-		} else {
+		if ($response['status'] != 500) {
 			$response['message'] = $new ? 'saved':'created';
 			$response['status'] = 200;
 		}
