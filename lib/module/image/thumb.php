@@ -14,6 +14,12 @@ if ($name && $size) {
 	def($size[1], null);
 
 	foreach ($dirs as $dir) {
+		$help = substr($dir, 1);
+
+		if (strpos($name, $help) === 0) {
+			$name = str_replace($help, '', $name);
+		}
+
 		$path = \System\Composer::resolve($dir.'/'.$name);
 
 		if ($path) {
