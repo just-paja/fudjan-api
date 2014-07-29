@@ -78,12 +78,23 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 			if (any($sort)) {
 				foreach ($sort as $sort_item) {
 					def($sort_item['mode'], 'asc');
-					$sort_by[] = $sort_item['attr'].' '.$sort_item['mode'];
+
+					if (isset($sort_item['attr'])) {
+						$sort_by[] = $sort_item['attr'].' '.$sort_item['mode'];
+					} else {
+						$response['status'] = 400;
+						$response['message'] = 'malformed-sort';
+						$response['attr'] = $sort;
+						break;
+					}
 				}
 			} else {
 				$sort_by = array('created_at desc');
 			}
+		}
 
+
+		if ($response['status'] == 200) {
 			if (any($filters)) {
 				foreach ($filters as $filter=>$filter_val) {
 					if ($filter == 'id') {
