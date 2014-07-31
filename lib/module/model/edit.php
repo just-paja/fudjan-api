@@ -41,6 +41,12 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 					}
 				} else if ($def[0] == 'password') {
 					$item->$attr_name = hash_passwd($val);
+				} else if ($def[0] == 'bool') {
+					if ($val == 'false') {
+						$val = false;
+					}
+
+					$item->$attr_name = $val;
 				} else {
 					$item->$attr_name = $val;
 				}
