@@ -59,7 +59,7 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 		}
 
 		if ($response['status'] != 500) {
-			$response['message'] = $new ? 'saved':'created';
+			$response['message'] = $new ? 'created':'saved';
 			$response['status'] = 200;
 		}
 
