@@ -140,8 +140,21 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 						foreach ($joins as $attr) {
 							$rel = $item->$attr;
 
-							if ($rel && $rel->can_be(\System\Model\Perm::BROWSE, $request->user)) {
-								$obj[$attr] = $rel->to_object();
+							if ($rel) {
+								if (($rel instanceof \System\Model\Perm) && $rel->can_be(\System\Model\Perm::BROWSE, $request->user)) {
+									$obj[$attr] = $rel->to_object();
+								} else {
+									$valid = false;
+									$response['status'] = 403;
+									$response['message'] = 'access-denied';
+									$response['errors'] = array(
+										array(
+											'rel'     => $attr,
+											'message' => 'denied'
+										)
+									);
+									break;
+								}
 							}
 						}
 					}
