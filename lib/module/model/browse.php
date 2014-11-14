@@ -107,16 +107,32 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 						} else {
 							$query->where_in($filter, $filter_val);
 						}
+					} else if (is_numeric($filter) && is_string($filter_val)) {
+						$response['status'] = 400;
+						$response['message'] = 'invalid-filter';
+						$response['attr'] = array(
+							'filter' => $filter,
+							'val' => $filter_val
+						);
+						break;
+
 					} else {
 						if (\System\Model\Database::attr_exists($cname, $filter)) {
 							$query->where(array($filter => $filter_val));
 						} else if ($cname::has_filter($filter)) {
 							$cname::filter($query, $filter, $filter_val);
-						} else throw new \System\Error\Argument('Model does not have attr', $filter);
+						} else {
+							$response['status'] = 400;
+							$response['message'] = 'unknown-attr';
+							$response['attr'] = $filter;
+							break;
+						}
 					}
 				}
 			}
+		}
 
+		if ($response['status'] == 200) {
 			$query->paginate($per_page, $page)->sort_by(implode(', ', $sort_by));
 			$send = true;
 
