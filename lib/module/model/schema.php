@@ -1,5 +1,8 @@
 <?
 
+$page     = 0;
+$per_page = 1;
+
 $this->req('model');
 
 $cname = System\Loader::get_class_from_model($model);
@@ -12,15 +15,17 @@ $res = array(
 
 
 if ($exists) {
-	if ($cname::can_user(\System\Model\Perm::VIEW_SCHEMA, $request->user)) {
+	try {
 		$schema = $cname::get_visible_schema($request->user);
+	} catch(\System\Error\AccessDenied $e) {
+		$res['status'] = 403;
+		$res['message'] = 'access-denied';
+	}
 
+	if ($schema) {
 		$res['status'] = 200;
 		$res['message'] = 'ok';
 		$res['data'] = $schema;
-	} else {
-		$res['status'] = 403;
-		$res['message'] = 'access-denied';
 	}
 }
 

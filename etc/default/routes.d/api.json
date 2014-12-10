@@ -1,4 +1,11 @@
 [
+	["/api/schema/([^/]+)$", {
+		"format":"json",
+		"modules":[
+			["schema", {"package":"#{0}"}]
+		]
+	}, "api_schema", "/api/model/{model}"],
+
 	["/api/model/([^/]+)$", {
 		"format":"json",
 		"modules":[
