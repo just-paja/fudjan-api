@@ -7,6 +7,7 @@ $policy = function($rq, $res) {
 	};
 
 	$urls = array(
+		'pack'   => $past_route($rq, 'api_schema'),
 		'schema' => $past_route($rq, 'api_model_schema'),
 		'browse' => $past_route($rq, 'api_model_browse'),
 		'create' => $past_route($rq, 'api_model_create'),
