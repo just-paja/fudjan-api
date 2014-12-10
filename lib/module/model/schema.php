@@ -10,10 +10,6 @@ $res = array(
 	'message' => 'schema-not-found'
 );
 
-$rel_attrs = array(
-	\System\Model\Database::REL_BELONGS_TO,
-	\System\Model\Database::REL_HAS_MANY
-);
 
 if ($exists) {
 	if ($cname::can_user(\System\Model\Perm::VIEW_SCHEMA, $request->user)) {
