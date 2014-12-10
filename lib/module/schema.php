@@ -26,22 +26,23 @@ if (isset($packages[$package])) {
 				$rel_cname = \System\Loader::get_class_from_model($attr['model']);
 				$rel_model = \System\Loader::get_model_from_class($attr['model']);
 
-				if (empty($pack[$rel_model])) {
+				if (!array_key_exists($rel_model, $pack)) {
 					$pack[$rel_model] = $rel_cname::get_visible_schema($request->user);
 				}
 			}
 		}
 
 		$pack[$model] = $schema;
+	}
 
-		foreach ($pack as $model => $def) {
-			$data[] = array(
-				"name"   => $model,
-				"static" => array(
-					"attrs" => $def
-				)
-			);
-		}
+	foreach ($pack as $name => $def) {
+		$data[] = array(
+			"name"    => $name,
+			"parents" => array('model'),
+			"static"  => array(
+				"attrs" => $def
+			)
+		);
 	}
 
 	$res = array(
