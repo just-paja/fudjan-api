@@ -4,7 +4,7 @@
 		"modules":[
 			["schema", {"package":"#{0}"}]
 		]
-	}, "api_schema", "/api/model/{model}"],
+	}, "api_schema", "/api/schema/{name}"],
 
 	["/api/model/([^/]+)$", {
 		"format":"json",
