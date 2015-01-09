@@ -77,14 +77,34 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 
 			if (any($sort)) {
 				foreach ($sort as $sort_item) {
-					def($sort_item['mode'], 'asc');
+					if (is_string($sort_item)) {
+						$sort_tmp  = explode(' ', $sort_item);
+						$sort_item = array('attr' => $sort_tmp[0]);
 
-					if (isset($sort_item['attr'])) {
-						$sort_by[] = $sort_item['attr'].' '.$sort_item['mode'];
+						if (isset($sort_tmp[1])) {
+							$sort_item['mode'] = $sort_tmp[1];
+						}
+					}
+
+					if (is_array($sort_item)) {
+						def($sort_item['mode'], 'asc');
+
+						if (isset($sort_item['attr'])) {
+							if ($sort_item['attr'] == 'id') {
+								$sort_item['attr'] = $cname::get_id_col($cname);
+							}
+
+							$sort_by[] = $sort_item['attr'].' '.$sort_item['mode'];
+						} else {
+							$response['status'] = 400;
+							$response['message'] = 'malformed-sort';
+							$response['attr'] = $sort;
+							break;
+						}
 					} else {
 						$response['status'] = 400;
 						$response['message'] = 'malformed-sort';
-						$response['attr'] = $sort;
+						$response['attr'] = $sort_item;
 						break;
 					}
 				}
