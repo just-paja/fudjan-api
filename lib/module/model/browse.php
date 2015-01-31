@@ -57,14 +57,29 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 			}
 
 			if ($joins) {
-				$joins = array_map('strval', $joins);
+				foreach ($joins as $key=>$attr) {
+					if (is_string($attr)) {
+						$attr = array(
+							"name" => $attr
+						);
+					}
 
-				foreach ($joins as $attr) {
-					$def = \System\Model\Database::get_attr($cname, $attr);
-
-					if (!in_array($def[0], array(\System\Model\Database::REL_BELONGS_TO, \System\Model\Database::REL_HAS_ONE))) {
+					if (!isset($attr['name'])) {
 						$response['status'] = 400;
-						$response['message'] = 'not-a-belongs-to-relation';
+						$response['message'] = 'missing-attr-name';
+						$response['attr'] = $attr;
+						break;
+					}
+
+					if (!isset($attr['as'])) {
+						$attr['as'] = $attr['name'];
+					}
+
+					if ($cname::is_rel($cname, $attr['name'])) {
+						$joins[$key] = $attr;
+					} else {
+						$response['status'] = 400;
+						$response['message'] = 'not-a-relation';
 						$response['attr'] = $attr;
 					}
 				}
@@ -152,6 +167,7 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 			}
 		}
 
+
 		if ($response['status'] == 200) {
 			$query->paginate($per_page, $page)->sort_by(implode(', ', $sort_by));
 			$send = true;
@@ -174,23 +190,58 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 
 					if ($joins) {
 						foreach ($joins as $attr) {
-							$rel = $item->$attr;
+							$allowed = true;
+							$attr_name = $attr['name'];
+							$def = $cname::get_attr($cname, $attr_name);
 
-							if ($rel) {
-								if (($rel instanceof \System\Model\Perm) && $rel->can_be(\System\Model\Perm::BROWSE, $request->user)) {
-									$obj[$attr] = $rel->to_object();
-								} else {
-									$valid = false;
-									$response['status'] = 403;
-									$response['message'] = 'access-denied';
-									$response['errors'] = array(
-										array(
-											'rel'     => $attr,
-											'message' => 'denied'
-										)
-									);
-									break;
+							if (in_array($def[0], array($cname::REL_BELONGS_TO, $cname::REL_HAS_ONE))) {
+								$rel = $item->$attr_name;
+
+								if ($rel) {
+									if (($rel instanceof \System\Model\Perm) && $rel->can_be($cname::BROWSE, $request->user)) {
+										$obj[$attr['as']] = $rel->to_object();
+									} else {
+										$allowed = false;
+									}
 								}
+							} else if ($def[0] == $cname::REL_HAS_MANY) {
+								$rel_cname = $def['model'];
+
+								if ($rel_cname::can_user($rel_cname::BROWSE, $request->user)) {
+									$rel = $item->$attr_name;
+
+									if (isset($attr['filters'])) {
+										$rel->add_filters($attr['filters']);
+									}
+
+									if (isset($attr['limit'])) {
+										$rel->paginate($attr['limit']);
+									}
+
+									$rel_data = $rel->fetch();
+									$obj[$attr['as']] = array();
+
+									foreach ($rel_data as $rel_obj) {
+										if ($rel_obj->can_be($cname::BROWSE, $request->user)) {
+											$obj[$attr['as']] = $rel_obj->to_object_with_perms($request->user);
+										}
+									}
+								} else {
+									$allowed = false;
+								}
+							}
+
+							if (!$allowed) {
+								$valid = false;
+								$response['status'] = 403;
+								$response['message'] = 'access-denied';
+								$response['errors'] = array(
+									array(
+										'rel'     => $attr,
+										'message' => 'denied'
+									)
+								);
+								break;
 							}
 						}
 					}
