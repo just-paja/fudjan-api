@@ -60,11 +60,11 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 				foreach ($joins as $key=>$attr) {
 					if (is_string($attr)) {
 						$attr = array(
-							"name" => $attr
+							"attr" => $attr
 						);
 					}
 
-					if (!isset($attr['name'])) {
+					if (!isset($attr['attr'])) {
 						$response['status'] = 400;
 						$response['message'] = 'missing-attr-name';
 						$response['attr'] = $attr;
@@ -72,10 +72,10 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 					}
 
 					if (!isset($attr['as'])) {
-						$attr['as'] = $attr['name'];
+						$attr['as'] = $attr['attr'];
 					}
 
-					if ($cname::is_rel($cname, $attr['name'])) {
+					if ($cname::is_rel($cname, $attr['attr'])) {
 						$joins[$key] = $attr;
 					} else {
 						$response['status'] = 400;
@@ -138,7 +138,17 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 
 					if (is_array($filter_val)) {
 						if (array_keys($filter_val) !== range(0, count($filter_val) - 1)) {
-							$query->add_filter($filter_val);
+							try {
+								$query->add_filter($filter_val);
+							} catch(\System\Error\Argument $e) {
+								$response['status'] = 400;
+								$response['message'] = 'invalid-filter';
+								$response['attr'] = array(
+									'filter' => $filter,
+									'val' => $filter_val
+								);
+								break;
+							}
 						} else {
 							$query->where_in($filter, $filter_val);
 						}
@@ -191,7 +201,7 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 					if ($joins) {
 						foreach ($joins as $attr) {
 							$allowed = true;
-							$attr_name = $attr['name'];
+							$attr_name = $attr['attr'];
 							$def = $cname::get_attr($cname, $attr_name);
 
 							if (in_array($def[0], array($cname::REL_BELONGS_TO, $cname::REL_HAS_ONE))) {
@@ -223,7 +233,7 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 
 									foreach ($rel_data as $rel_obj) {
 										if ($rel_obj->can_be($cname::BROWSE, $request->user)) {
-											$obj[$attr['as']] = $rel_obj->to_object_with_perms($request->user);
+											$obj[$attr['as']][] = $rel_obj->to_object_with_perms($request->user);
 										}
 									}
 								} else {
