@@ -8,7 +8,7 @@ $this->req('model');
 $cname = System\Loader::get_class_from_model($model);
 $exists = class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm');
 
-$res = array(
+$send = array(
 	'status'  => 404,
 	'message' => 'schema-not-found'
 );
@@ -18,14 +18,14 @@ if ($exists) {
 	try {
 		$schema = $cname::get_visible_schema($request->user);
 	} catch(\System\Error\AccessDenied $e) {
-		$res['status'] = 403;
-		$res['message'] = 'access-denied';
+		$send['status'] = 403;
+		$send['message'] = 'access-denied';
 	}
 
 	if ($schema) {
-		$res['status'] = 200;
-		$res['message'] = 'ok';
-		$res['data'] = $schema;
+		$send['status'] = 200;
+		$send['message'] = 'ok';
+		$send['data'] = $schema;
 	}
 }
 
@@ -45,4 +45,4 @@ if (!$debug) {
 	$response->header('Age', '0');
 }
 
-$this->partial(null, $res);
+$this->partial(null, $send);

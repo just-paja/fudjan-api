@@ -5,7 +5,7 @@ $packages = cfg('resources', 'models');
 $page     = PHP_INT_MAX;
 $per_page = PHP_INT_MAX;
 
-$res = array(
+$send = array(
 	'status'  => 404,
 	'message' => 'api-schema-not-found'
 );
@@ -45,7 +45,7 @@ if (isset($packages[$package])) {
 		);
 	}
 
-	$res = array(
+	$send = array(
 		'status' => 200,
 		'data'   => $data
 	);
@@ -66,4 +66,4 @@ if (!$debug) {
 	$response->header('Age', '0');
 }
 
-$this->partial(null, $res);
+$this->partial(null, $send);
