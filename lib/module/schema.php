@@ -21,7 +21,7 @@ if (isset($packages[$package])) {
 		$model  = \System\Loader::get_model_from_class($model);
 		$schema = $cname::get_visible_schema($request->user);
 
-		foreach ($schema as $attr) {
+		foreach ($schema['attrs'] as $attr) {
 			if (in_array($attr['type'], $rels)) {
 				$rel_cname = \System\Loader::get_class_from_model($attr['model']);
 				$rel_model = \System\Loader::get_model_from_class($attr['model']);
@@ -39,9 +39,7 @@ if (isset($packages[$package])) {
 		$data[] = array(
 			"name"    => $name,
 			"parents" => array('model'),
-			"static"  => array(
-				"attrs" => $def
-			)
+			"static"  => $def
 		);
 	}
 
