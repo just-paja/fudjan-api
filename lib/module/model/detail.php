@@ -14,8 +14,8 @@ $response = array(
 $model = System\Loader::get_class_from_model($model);
 
 if (class_exists($model)) {
-	if ($item = find($model, $id)) {
-		if ($item->can_be(\System\Model\Perm::VIEW, $request->user)) {
+	if ($item = $model::find($id)) {
+		if ($item->can_be($model::VIEW, $request->user)) {
 			$response['status']  = 200;
 			$response['message'] = 'ok';
 			$response['data']    = $item->to_object();

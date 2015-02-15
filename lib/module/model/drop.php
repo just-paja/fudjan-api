@@ -10,8 +10,8 @@ $response = array(
 );
 
 if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
-	if ($item = find($cname, $id)) {
-		if ($item->can_be(System\Model\Perm::DROP, $request->user)) {
+	if ($item = $cname::find($id)) {
+		if ($item->can_be($cname::DROP, $request->user)) {
 			$item->drop();
 
 			$response['message'] = 'dropped';
