@@ -25,10 +25,10 @@ if ($request->get('per_page')) {
 }
 
 if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
-	if ($cname::can_user(\System\Model\Perm::BROWSE, $request->user)) {
+	if ($cname::can_user($cname::BROWSE, $request->user)) {
 		def($sort, array('created_at desc'));
 
-		$idc = \System\Model\Database::get_id_col($cname);
+		$idc = $cname::get_id_col();
 
 		if ($filters) {
 			try {
@@ -75,7 +75,7 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 						$attr['as'] = $attr['attr'];
 					}
 
-					if ($cname::is_rel($cname, $attr['attr'])) {
+					if ($cname::is_rel($attr['attr'])) {
 						$joins[$key] = $attr;
 					} else {
 						$response['status'] = 400;
@@ -87,7 +87,7 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 		}
 
 		if ($response['status'] == 200) {
-			$query = get_all($cname, $conds, $opts);
+			$query = $cname::get_all($conds, $opts);
 			$data = array();
 
 			if (any($sort)) {
@@ -162,7 +162,7 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 						break;
 
 					} else {
-						if (\System\Model\Database::attr_exists($cname, $filter)) {
+						if ($cname::attr_exists($filter)) {
 							$query->where(array($filter => $filter_val));
 						} else if ($cname::has_filter($filter)) {
 							$cname::filter($query, $filter, $filter_val);
@@ -202,7 +202,7 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 						foreach ($joins as $attr) {
 							$allowed = true;
 							$attr_name = $attr['attr'];
-							$def = $cname::get_attr($cname, $attr_name);
+							$def = $cname::get_attr($attr_name);
 
 							if (in_array($def[0], array($cname::REL_BELONGS_TO, $cname::REL_HAS_ONE))) {
 								$rel = $item->$attr_name;
