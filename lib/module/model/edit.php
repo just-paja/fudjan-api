@@ -25,10 +25,10 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 					}
 				}
 
-				if (in_array($def[0], array('file', 'image'))) {
+				if (in_array($def['type'], array('file', 'image'))) {
 					$helper_cname = '\System\File';
 
-					if ($def[0] == 'image') {
+					if ($def['type'] == 'image') {
 						$helper_cname = '\System\Image';
 					}
 
@@ -41,9 +41,9 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 							}
 						}
 					}
-				} else if ($def[0] == 'password') {
+				} else if ($def['type'] == 'password') {
 					$item->$attr_name = hash_passwd($val);
-				} else if ($def[0] == 'bool') {
+				} else if ($def['type'] == 'bool') {
 					if ($val == 'false') {
 						$val = false;
 					}
