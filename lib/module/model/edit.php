@@ -49,6 +49,8 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 					}
 
 					$item->$attr_name = $val;
+				} else if ($def['type'] == 'datetime') {
+					$item->$attr_name = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $val);
 				} else {
 					$item->$attr_name = $val;
 				}
