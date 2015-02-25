@@ -50,7 +50,9 @@ if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 
 					$item->$attr_name = $val;
 				} else if ($def['type'] == 'datetime') {
+					$tz = new \DateTimeZone(\System\Settings::get('locales', 'timezone'));
 					$item->$attr_name = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $val);
+					$item->$attr_name->setTimeZone($tz);
 				} else {
 					$item->$attr_name = $val;
 				}
