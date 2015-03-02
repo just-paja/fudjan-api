@@ -7,12 +7,14 @@ namespace Module\Api\Model
 	{
 		public function run()
 		{
+			$rq = $this->request;
+			$res = $this->response;
+
 			$page     = 0;
 			$per_page = 1;
 
-			$this->req('model');
-
-			$cname = System\Loader::get_class_from_model($model);
+			$model = $this->req('model');
+			$cname = \System\Loader::get_class_from_model($model);
 			$exists = class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm');
 
 			$send = array(
@@ -23,7 +25,7 @@ namespace Module\Api\Model
 
 			if ($exists) {
 				try {
-					$schema = $cname::get_visible_schema($request->user);
+					$schema = $cname::get_visible_schema($rq->user);
 				} catch(\System\Error\AccessDenied $e) {
 					$send['status'] = 403;
 					$send['message'] = 'access-denied';
@@ -46,10 +48,10 @@ namespace Module\Api\Model
 			if (!$debug) {
 				$max_age = \System\Settings::get('cache', 'resource', 'max-age');
 
-				$response->header('Pragma', 'public,max-age='.$max_age);
-				$response->header('Cache-Control', 'public');
-				$response->header('Expires', date(\DateTime::RFC1123, time() + $max_age + rand(0,60)));
-				$response->header('Age', '0');
+				$res->header('Pragma', 'public,max-age='.$max_age);
+				$res->header('Cache-Control', 'public');
+				$res->header('Expires', date(\DateTime::RFC1123, time() + $max_age + rand(0,60)));
+				$res->header('Age', '0');
 			}
 
 			$this->partial(null, $send);

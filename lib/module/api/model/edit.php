@@ -7,12 +7,15 @@ namespace Module\Api\Model
 	{
 		public function run()
 		{
+			$id = $this->id;
+			$new = $this->new;
+
 			def($id);
 			def($new, false);
 
-			$this->req('model');
-
-			$cname = System\Loader::get_class_from_model($model);
+			$model = $this->req('model');
+			$rq    = $this->request;
+			$cname = \System\Loader::get_class_from_model($model);
 			$response = array(
 				'message' => 'not-found',
 				'status'  => 404,
@@ -20,7 +23,7 @@ namespace Module\Api\Model
 
 			if (class_exists($cname) && is_subclass_of($cname, '\System\Model\Perm')) {
 				if ($item = $new ? (new $cname()):$cname::find($id)) {
-					$data = $request->post();
+					$data = $rq->post();
 
 					foreach ($data as $attr_name=>$val) {
 						if ($item::has_attr($attr_name)) {
@@ -41,7 +44,7 @@ namespace Module\Api\Model
 
 								if (is_array($val)) {
 									if (any($val['method']) && any($val[$val['method']])) {
-										$data = $request->post($val[$val['method']]);
+										$data = $rq->post($val[$val['method']]);
 
 										if ($data) {
 											$item->$attr_name = $helper_cname::from_tmp($data['tmp_name'], $data['name']);
@@ -66,10 +69,10 @@ namespace Module\Api\Model
 						}
 					}
 
-					$item->request = $request;
+					$item->request = $rq;
 
-					if ($item::has_attr('author') && $request->user) {
-						$item->author = $request->user;
+					if ($item::has_attr('author') && $rq->user) {
+						$item->author = $rq->user;
 					}
 
 					try {
