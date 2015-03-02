@@ -1,43 +1,55 @@
 [
-	["/api/schema/([^/]+)$", {
+	{
+		"name":"api_schema",
+		"url":"/api/schema/{name:varchar}",
 		"format":"json",
 		"modules":[
-			["schema", {"package":"#{0}"}]
+			["api.model.pack"]
 		]
-	}, "api_schema", "/api/schema/{name}"],
+	},
 
-	["/api/model/([^/]+)$", {
+	{
+		"name":"api_model_schema",
+		"url":"/api/model/{model:varchar}",
 		"format":"json",
 		"modules":[
-			["model/schema", {"model":"#{0}"}]
+			["api.model.schema"]
 		]
-	}, "api_model_schema", "/api/model/{model}"],
+	},
 
-	["/api/model/([^/]+)/browse$", {
+	{
+		"name":"api_model_browse",
+		"url":"/api/model/{model:varchar}/browse",
 		"format":"json",
 		"modules":[
-			["model/browse", {"model":"#{0}"}]
+			["api.model.browse"]
 		]
-	}, "api_model_browse", "/api/model/{model}/browse"],
+	},
 
-	["/api/model/([^/]+)/create$", {
+	{
+		"name":"api_model_create",
+		"url":"/api/model/{model:varchar}/create",
 		"format":"json",
 		"modules":[
-			["model/edit", {"model":"#{0}", "new":true}]
+			["api.model.edit", {"new":true}]
 		]
-	}, "api_model_create", "/api/model/{model}/create"],
+	},
 
-	["/api/model/([^/]+)/([^/]+)/edit$", {
+	{
+		"name":"api_model_object_edit",
+		"url":"/api/model/{model:varchar}/{id:number}/edit",
 		"format":"json",
 		"modules":[
-			["model/edit", {"model":"#{0}", "id":"#{1}"}]
+			["api.model.edit"]
 		]
-	}, "api_model_object_edit", "/api/model/{model}/{id}/edit"],
+	},
 
-	["/api/model/([^/]+)/([^/]+)/drop$", {
+	{
+		"name":"api_model_object_drop",
+		"url":"/api/model/{model:varchar}/{id:number}/drop",
 		"format":"json",
 		"modules":[
-			["model/drop", {"model":"#{0}", "id":"#{1}"}]
+			["api.model.drop"]
 		]
-	}, "api_model_object_drop", "/api/model/{model}/{id}/drop"]
+	}
 ]

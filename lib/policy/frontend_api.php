@@ -2,8 +2,7 @@
 
 $policy = function($rq, $res) {
 	$past_route = function($rq, $name) {
-		$r = \System\Router::get_route($rq->host, $name);
-		return $r[3];
+		return \System\Router::get_route_str($rq->host, $name);
 	};
 
 	$urls = array(
