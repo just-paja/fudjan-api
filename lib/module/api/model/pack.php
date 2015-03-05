@@ -66,10 +66,10 @@ namespace Module\Api\Model
 			if (!$debug) {
 				$max_age = \System\Settings::get('cache', 'resource', 'max-age');
 
-				$response->header('Pragma', 'public,max-age='.$max_age);
-				$response->header('Cache-Control', 'public');
-				$response->header('Expires', date(\DateTime::RFC1123, time() + $max_age + rand(0,60)));
-				$response->header('Age', '0');
+				$res->header('Pragma', 'public,max-age='.$max_age);
+				$res->header('Cache-Control', 'public');
+				$res->header('Expires', date(\DateTime::RFC1123, time() + $max_age + rand(0,60)));
+				$res->header('Age', '0');
 			}
 
 			$this->partial(null, $send);
