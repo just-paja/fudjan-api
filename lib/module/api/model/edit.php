@@ -60,9 +60,16 @@ namespace Module\Api\Model
 
 								$item->$attr_name = $val;
 							} else if ($def['type'] == 'datetime') {
-								$tz = new \DateTimeZone(\System\Settings::get('locales', 'timezone'));
-								$item->$attr_name = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $val);
-								$item->$attr_name->setTimeZone($tz);
+								$date = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $val);
+
+								if ($date) {
+									$tz = new \DateTimeZone(\System\Settings::get('locales', 'timezone'));
+									$date->setTimeZone($tz);
+								} else {
+									$date = null;
+								}
+
+								$item->$attr_name = $date;
 							} else {
 								$item->$attr_name = $val;
 							}
