@@ -63,7 +63,9 @@ namespace Module\Api\Model
 							$response['status'] = 400;
 							$response['message'] = 'malformed-joins';
 						}
+					}
 
+					if ($response['status'] == 200) {
 						if ($joins) {
 							foreach ($joins as $key=>$attr) {
 								if (is_string($attr)) {
@@ -170,7 +172,7 @@ namespace Module\Api\Model
 									break;
 
 								} else {
-									if ($cname::attr_exists($filter)) {
+									if ($cname::has_attr($filter)) {
 										$query->where(array($filter => $filter_val));
 									} else if ($cname::has_filter($filter)) {
 										$cname::filter($query, $filter, $filter_val);
@@ -185,6 +187,22 @@ namespace Module\Api\Model
 						}
 					}
 
+					if ($response['status'] == 200) {
+						if (any($joins)) {
+							foreach ($joins as $j) {
+								$attr = $cname::get_attr($j['attr']);
+
+								if ($attr['type'] == 'has_many' && any($attr['is_bilinear'])) {
+									$join_alias = 't_'.$j['attr'];
+									$table_name = $cname::get_bilinear_table_name($attr);
+									$rel_model = $attr['model'];
+									$using = $cname::get_id_col();
+
+									$query->join($table_name, "USING(".$using.")", $join_alias);
+								}
+							}
+						}
+					}
 
 					if ($response['status'] == 200) {
 						$query->paginate($per_page, $page)->sort_by(implode(', ', $sort_by));
@@ -212,7 +230,7 @@ namespace Module\Api\Model
 										$attr_name = $attr['attr'];
 										$def = $cname::get_attr($attr_name);
 
-										if (in_array($def[0], array($cname::REL_BELONGS_TO, $cname::REL_HAS_ONE))) {
+										if (in_array($def['type'], array($cname::REL_BELONGS_TO, $cname::REL_HAS_ONE))) {
 											$rel = $item->$attr_name;
 
 											if ($rel) {
@@ -222,7 +240,7 @@ namespace Module\Api\Model
 													$allowed = false;
 												}
 											}
-										} else if ($def[0] == $cname::REL_HAS_MANY) {
+										} else if ($def['type'] == $cname::REL_HAS_MANY) {
 											$rel_cname = $def['model'];
 
 											if ($rel_cname::can_user($rel_cname::BROWSE, $rq->user)) {
