@@ -30,5 +30,36 @@ namespace Test\Api
 			$this->assertEquals($obj->per_page, 0);
 		}
 
+
+		public function test_decode_part()
+		{
+			$obj = new \Module\Api\Model\Browse(array(
+				"page" => 0,
+				"request" => new \System\Http\Request(array(
+					"get" => array(
+						'foo' => '',
+						'arr' => '[]',
+						'str' => 'str',
+					)
+				))
+			));
+
+			// undefined, should pass as null
+			$this->assertNull($obj->request_decode_part('bar'));
+
+			// defined empty, should pass as null
+			$this->assertNull($obj->request_decode_part('foo'));
+
+			// defined string, should fail
+			try {
+				$ex = null;
+				$obj->request_decode_part('str');
+			} catch (\System\Error\Format $e) {
+				$ex = $e;
+			}
+
+			$this->assertTrue($ex !== null);
+		}
+
 	}
 }
