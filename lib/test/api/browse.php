@@ -1,5 +1,19 @@
 <?
 
+namespace Test\Api\Browse
+{
+	class Dummy extends \System\Model\Perm
+	{
+		static protected $attrs = array(
+			"test_join" => array(
+				"type"  => 'has_many',
+				"model" => 'Test\Api\Browse\Dummy'
+			)
+		);
+	}
+}
+
+
 namespace Test\Api
 {
 	class Browse extends \PHPUnit_Framework_TestCase
@@ -59,6 +73,34 @@ namespace Test\Api
 			}
 
 			$this->assertTrue($ex !== null);
+		}
+
+
+		public function test_parse_joins()
+		{
+			$obj = new \Module\Api\Model\Browse(array(
+				"page" => 0,
+				"model" => 'Test.Api.Browse.Dummy',
+				"cname" => '\Test\Api\Browse\Dummy',
+				"request" => new \System\Http\Request()
+			));
+
+			try {
+				$ex = null;
+				$obj->request_parse_joins(null);
+			} catch (\System\Error\Format $ex) {
+			}
+
+			$this->assertTrue($ex != null);
+			$joins = $obj->request_parse_joins(array('test_join'));
+
+			$this->assertTrue(is_array($joins));
+			$this->assertEquals(count($joins), 1);
+			$this->assertTrue(array_key_exists(0, $joins));
+			$this->assertTrue(array_key_exists('attr', $joins[0]));
+			$this->assertTrue(array_key_exists('as', $joins[0]));
+			$this->assertEquals($joins[0]['attr'], 'test_join');
+			$this->assertEquals($joins[0]['as'], 'test_join');
 		}
 
 	}
