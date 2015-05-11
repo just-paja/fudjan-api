@@ -6,7 +6,6 @@ namespace Module\Api\Model
 	{
 		protected $status = 200;
 		protected $joins = array();
-		protected $cname;
 		protected $query;
 		protected $count;
 		protected $sort = array();
@@ -23,6 +22,10 @@ namespace Module\Api\Model
 			$this->filters = $this->request_decode_part('filters');
 			$this->sort    = $this->request_decode_part('sort');
 			$this->joins   = $this->request_decode_part('join');
+
+			if (!is_array($this->joins)) {
+				$this->joins = array();
+			}
 		}
 
 
@@ -49,11 +52,16 @@ namespace Module\Api\Model
 		}
 
 
-		public function request_parse_joins()
+		public function request_parse_joins($joins_in)
 		{
 			$cname = $this->cname;
+			$joins = array();
 
-			foreach ($this->joins as $key=>$attr) {
+			if (!is_array($joins_in)) {
+				throw new \System\Error\Format('malformed-joins', 'joins-must-be-array');
+			}
+
+			foreach ($joins_in as $key=>$attr) {
 				if (is_string($attr)) {
 					$attr = array(
 						"attr" => $attr
@@ -70,12 +78,14 @@ namespace Module\Api\Model
 				}
 
 				if ($cname::is_rel($attr['attr'])) {
-					$this->joins[$key] = $attr;
+					$joins[$key] = $attr;
 				} else {
 					$this->status = 400;
 					throw new \System\Error\Format('not-a-relation', $attr);
 				}
 			}
+
+			return $joins;
 		}
 
 
@@ -135,7 +145,7 @@ namespace Module\Api\Model
 
 		public function request_parse()
 		{
-			$this->request_parse_joins($this->joins);
+			$this->joins = $this->request_parse_joins($this->joins);
 			$this->request_parse_sort($this->sort);
 			$this->request_parse_filters($this->filters);
 		}
