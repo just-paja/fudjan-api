@@ -277,7 +277,7 @@ namespace Module\Api\Model
 							throw new \System\Error\Argument('denied-access-to-relation', $attr_name);
 						}
 
-						$obj[$attr['as']] = $rel->to_object();
+						$obj[$attr['as']] = $rel->to_object_with_perms($this->request->user);
 					}
 				} else if ($def['type'] == $cname::REL_HAS_MANY) {
 					$rel_cname = $def['model'];
