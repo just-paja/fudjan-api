@@ -1,4 +1,4 @@
-<?
+<?php
 
 $policy = function($rq, $res) {
 	$rq->fconfig = array_merge_recursive($rq->fconfig, array(

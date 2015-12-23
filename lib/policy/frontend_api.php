@@ -1,4 +1,4 @@
-<?
+<?php
 
 $policy = function($rq, $res) {
 	$past_route = function($rq, $name) {
