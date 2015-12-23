@@ -6,6 +6,6 @@
 		"vendor-dir":"lib/vendor"
 	},
 	"require":{
-		"just-paja/fudjan":"^0.7"
+		"just-paja/fudjan":"^1.0.0"
 	}
 }
