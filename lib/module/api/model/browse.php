@@ -91,6 +91,8 @@ namespace Module\Api\Model
 
 		public function request_parse_sort($sort)
 		{
+			$cname = $this->cname;
+
 			if (empty($sort)) {
 				return $this->sort = array('created_at desc');
 			}
@@ -118,7 +120,7 @@ namespace Module\Api\Model
 				def($sort_item['mode'], 'asc');
 
 				if ($sort_item['attr'] == 'id') {
-					$sort_item['attr'] = $cname::get_id_col($cname);
+					$sort_item['attr'] = $cname::get_id_col();
 				}
 
 				$sort_by[] = $sort_item['attr'].' '.$sort_item['mode'];
