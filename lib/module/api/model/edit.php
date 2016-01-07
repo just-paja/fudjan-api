@@ -59,6 +59,28 @@ namespace Module\Api\Model
 								}
 
 								$item->$attr_name = $val;
+							} else if ($def['type'] == 'time') {
+								$date = \DateTime::createFromFormat('H:i:s', $val);
+
+								if ($date) {
+									$tz = new \DateTimeZone(\System\Settings::get('locales', 'timezone'));
+									$date->setTimeZone($tz);
+								} else {
+									$date = null;
+								}
+
+								$item->$attr_name = $date;
+							} else if ($def['type'] == 'date') {
+								$date = \DateTime::createFromFormat('Y-m-d', $val);
+
+								if ($date) {
+									$tz = new \DateTimeZone(\System\Settings::get('locales', 'timezone'));
+									$date->setTimeZone($tz);
+								} else {
+									$date = null;
+								}
+
+								$item->$attr_name = $date;
 							} else if ($def['type'] == 'datetime') {
 								$date = \DateTime::createFromFormat('Y-m-d\TH:i:sO', $val);
 
