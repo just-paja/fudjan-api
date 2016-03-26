@@ -92,7 +92,7 @@ namespace Module\Api\Model
 		public function request_parse_sort($sort)
 		{
 			if (empty($sort)) {
-				return $this->sort = array('created_at desc');
+				return $this->sort = array();
 			}
 
 			foreach ($sort as $sort_item) {
